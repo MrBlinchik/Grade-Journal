@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал оценок</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+     <h1 id="journal-title">ЖУРНАЛ ОЦЕНОК</h1>
+    <header>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#home" onclick="openTab('home')">Главная</a></li>
+            <li><a href="#upload" onclick="openTab('upload')">Загрузить оценки</a></li>
+            <li><a href="#edit" onclick="openTab('edit')">Создать/Редактировать</a></li>
+            <li><a href="#table-stats" onclick="openTab('table-stats')">Статистика (таблица)</a>
+            <li><a href="#graph-stats" onclick="openTab('graph-stats')">Статистика (графики)</a></li>
+            <li><a href="#help" onclick="openTab('help')">Помощь</a></li>
+            <li><a href="#about" onclick="openTab('about')">О программе</a></li>
+        </ul>
+    </nav>
+    
+    <section id="home" class="content-section active">
+        <h2>Добро пожаловать в журнал оценок!</h2>
+        <p>Выберите одну из вкладок в меню для начала работы.</p>
+    </section>
+
+    <section id="upload" class="content-section hidden">
+    <input type="file" id="file-input" accept=".csv, .txt, .xlsx" style="display:none;">
+    <button id="upload-button">Загрузить файл</button>
+    <button id="download-data-button">Скачать файл</button>
+    <div id="data-preview"></div>
+     <!-- Сюда будет вставлена таблица с данными -->
+    </div>
+    </section>
+
+
+    <section id="edit" class="content-section hidden">
+        <!-- Форма для ввода данных -->
+        <form id="student-form">
+            <label for="student-name">ФИО ученика:</label>
+            <input type="text" id="student-name" required><br>
+            <label for="student-class">Класс:</label>
+            <input type="text" id="student-class" required><br>
+            <label for="grade-informatics">Информатика:</label>
+            <input type="number" id="grade-informatics" min="2" max="5"><br>
+            <label for="grade-physics">Физика:</label>
+            <input type="number" id="grade-physics" min="2" max="5"><br>
+            <label for="grade-math">Математика:</label>
+            <input type="number" id="grade-math" min="2" max="5"><br>
+            <label for="grade-literature">Литература:</label>
+            <input type="number" id="grade-literature" min="2" max="5"><br>
+            <label for="grade-music">Музыка:</label>
+            <input type="number" id="grade-music" min="2" max="5"><br>
+            <button type="button" onclick="addOrUpdateStudent()">Добавить/Обновить</button>
+        </form>
+        <!-- Таблица для отображения данных -->
+    </section>
+
+    <section id="table-stats" class="content-section">
+        <h2>Статистика (таблица)</h2>
+        <div id="subject-statistics-container"></div>
+        <div id="student-statistics-container"></div>
+        <!-- Здесь будет отображаться статистика в табличном виде -->
+    </section>
+
+    <section id="graph-stats" class="content-section">
+        <!-- Здесь будут отображаться графики статистики -->
+        <div id="charts">
+            <canvas id="class-chart" width="400" height="200"></canvas>
+            <canvas id="student-chart" width="400" height="200"></canvas>
+        </div>
+    </section>
+
+    <section id="help" class="content-section hidden">
+        <h2>Помощь</h2>
+          <p>
+            Чтобы загрузить файл .csv и прочитать из него данные, выполните следующие действия:
+            Перейдите на вкладку «Загрузить оценки».
+            Нажмите кнопку «Выбрать файл», чтобы выбрать файл для загрузки.
+            Во всплывающем окне перейдите к файлу и выберите его.
+            Нажмите кнопку «Загрузить файл .csv».
+            После выполнения этих действий данные из выбранного файла будут загружены в таблицу, готовую для дальнейшего редактирования.
+          </p>
+
+      <div class="help-block2">
+        <h2 align="left">Создание/Редактирование журнала</h2>
+          <p>
+            Чтобы начать редактирование данных, выполните следующие действия:
+            Перейдите на вкладку «Создать/Редактировать журнал».
+            В левой части вкладки отобразится таблица с загруженными данными об учениках.
+            Поля для добавления нового ученика и применения изменений расположены справа от таблицы.
+            Чтобы начать редактирование данных об учащихся, нажмите кнопку «Изменить» в столбце «Действия».
+            После нажатия кнопки данные об ученике отобразятся в полях ввода.
+            Внесите необходимые изменения в данные.
+            Нажмите кнопку «Применить изменения», чтобы обновить данные об учащихся в таблице.
+            Чтобы добавить нового студента, заполните поля ввода справа от таблицы и нажмите кнопку «Добавить студента».
+            Если в журнале есть нежелательные данные учащихся, вы можете удалить их, нажав соответствующую кнопку в графе «Действия».
+            Выполнив эти шаги, вы сможете эффективно редактировать данные в журнале и управлять ими.
+          </p>
+      </div>
+
+      <div class="help-block3">
+        <h2 align="left">Статистика(Таблица)</h2>
+          <p>
+            Для отслеживания статистики обучения учащихся перейдите на вкладку «Статистика (табличная)». Здесь вы можете просмотреть различные показатели:
+            Средний балл по каждому предмету и в каждом классе.
+            Медианные оценки по каждому предмету и в каждом классе.
+            Количество учащихся со 2, 3, 4, 5 оценками по каждому предмету в каждом классе.
+            Процент учащихся, имеющих 2, 3, 4, 5 оценки по каждому предмету в каждом классе.
+          С помощью этой вкладки вы можете получить полную картину успеваемости учащихся по различным предметам и классам.
+          </p>
+      </div>
+    
+      <div class="help-block4">
+        <h2 align="left">Статистика(График)</h2>
+          <p>
+            Для визуального отслеживания статистики обучения учащихся перейдите на вкладку «Статистика(График)». Здесь вы можете проанализировать следующие данные:
+            Средний балл по каждому предмету и в каждом классе.
+            Медианные оценки по каждому предмету и в каждом классе.
+            Количество учащихся со 2, 3, 4, 5 оценками по каждому предмету в каждом классе.
+            Процент учащихся со 2, 3, 4, 5 оценками по каждому предмету в каждом классе.
+            С помощью графиков можно наглядно оценить динамику успеваемости учащихся и выявить тенденции по различным предметам и классам.
+          </p>
+      </div>
+    </section>
+
+    <section id="about" class="content-section hidden">
+        <h3>О программе</h3>
+        <!-- Информация о разработчике -->
+        <p>ФИО разработчика: </p> <p>Чертенков Андрей Владимирович</p>
+        <p>Контактные данные: </p> 
+        <p> GitHub <a href="https://github.com/MrBlinchik/">MrBlinchik</a> </p>
+        <p> VK <a href="https://vk.com/mr.blinn">Mr.Blin</a></p>
+        <img src="ava.jpg" alt="Фото разработчика">
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
